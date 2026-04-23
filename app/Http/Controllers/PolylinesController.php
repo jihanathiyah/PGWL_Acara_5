@@ -7,15 +7,12 @@ use Illuminate\Http\Request;
 
 class PolylinesController extends Controller
 {
-    // Fungsi untuk mengkoneksikan model ke controller
+    protected $polylines;
+
     public function __construct()
     {
         $this->polylines = new polylinesModel();
     }
-
-    /**
-     * Display a listing of the resource.
-     */
 
     public function index()
     {
@@ -35,37 +32,36 @@ class PolylinesController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
+        //Validasi Input
         $request->validate(
             [
                 'geometry_polyline' => 'required',
                 'name' => 'required|string|max:255',
-                'description' => 'required|string',
             ],
             [
                 'geometry_polyline.required' => 'Field geometry polyline harus diisi.',
-                'name.required' => 'Field name harus diisi.',
-                'name.string' => 'Field name harus berupa string.',
-                'name.max' => 'Field name tidak boleh lebih dari 255 karakter.',
-                'description.required' => 'Field descriptiom harus diisi',
-                'description.string' => 'Field description harus berupa string.',
+                'name.required' => 'Field nama harus diisi.',
+                'name.string' => 'Field nama harus berupa string.',
+                'name.max' => 'Field nama tidak boleh lebih dari 255 karakter.',
             ]
         );
 
         $data = [
-            'geom' => $request->geometry_polyline,
-            'name' => $request->name,
-            'description' => $request->description,
+        'geom' => $request->geometry_polyline,
+        'name' => $request->name,
+        'description' => $request->description,
         ];
 
-        // Simpan data ke database
+        //Simpan data ke database
         if (!$this->polylines->create($data)) {
-            return redirect()->route('peta')->with('error', 'Gagal menyimpan data polyline.');
-        }
+            return redirect()->route('peta')->with('error',
+            'Gagal menyimpan data polylines.');
+        };
 
-        // Kembali ke halaman peta
-        return redirect()->route('peta')->with('success', 'Data polyline berhasil disimpan.');
-        }
+        //kembali ke halaman peta
+        return redirect()->route('peta')->with('success',
+        'Berhasil menyimpan data polylines.');
+    }
 
     /**
      * Display the specified resource.

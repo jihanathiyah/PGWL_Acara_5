@@ -14,8 +14,7 @@ class PageController extends Controller
 
         return view('map', $data);
     }
-
-     public function tabel()
+    public function tabel()
     {
         $data = [
             'title' => 'Tabel',

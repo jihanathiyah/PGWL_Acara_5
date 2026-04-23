@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\pointsModel;
 use Illuminate\Http\Request;
-
+use App\Models\pointsModel;
 
 class PointsController extends Controller
 {
