@@ -14,7 +14,7 @@ class pointsModel extends Model
     {
         $points = $this->select(DB::raw('
             id,
-            ST_AsGeoJSON(ST_GeomFromText(geom)) as geom,
+            ST_AsGeoJSON(geometry_point) as geom,
             name,
             description,
             created_at,

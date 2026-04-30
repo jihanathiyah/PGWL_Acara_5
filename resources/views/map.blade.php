@@ -11,18 +11,19 @@
     <style>
         /* Mengatur tinggi peta agar memenuhi seluruh layar */
         #map {
-            height: 100vh;
+            height: calc(100vh - 56px);
+            width: 100%;
+            );
         }
 
         /* Menghilangkan margin dan padding default dari body */
-        html,
-        body {
+        body,
+        html {
             height: 100%;
+            width: 100%;
+            ;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            font-family: sans-serif;
         }
 
         nav {
@@ -59,7 +60,7 @@
                     <h5 class="modal-title">Input Point</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('points.store') }}" method="post">
+                <form action="{{ route('points.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -74,6 +75,16 @@
                         <div class="mb-3">
                             <label for="geometry_point" class="form-label">Geometry</label>
                             <textarea class="form-control" id="geometry_point" name="geometry_point" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input class="form-control" type="file" id="image" name="image"
+                                onchange="document.getElementById('preview-image-point').src = window.URL.createObjectURL(this.files[0])">
+                        </div>
+
+                        <div class = "mb-3">
+                            <img src="" alt="" id="preview-image-point" class="img-thumbnail"
+                                width="400">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -93,7 +104,7 @@
                     <h5 class="modal-title">Input Polyline</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('polylines.store') }}" method="post">
+                <form action="{{ route('polylines.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -108,6 +119,17 @@
                         <div class="mb-3">
                             <label for="geometry_polyline" class="form-label">Geometry</label>
                             <textarea class="form-control" id="geometry_polyline" name="geometry_polyline" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input class="form-control" type="file" id="image" name="image"
+                                onchange="document.getElementById('preview-image-polyline').src = window.URL.createObjectURL(this.files[0])">
+                        </div>
+
+                        <div class = "mb-3">
+                            <img src="" alt="" id="preview-image-polyline" class="img-thumbnail"
+                                width="400">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -127,7 +149,7 @@
                     <h5 class="modal-title">Input Polygon</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('polygons.store') }}" method="post">
+                <form action="{{ route('polygons.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -142,6 +164,17 @@
                         <div class="mb-3">
                             <label for="geometry_polygon" class="form-label">Geometry</label>
                             <textarea class="form-control" id="geometry_polygon" name="geometry_polygon" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input class="form-control" type="file" id="image" name="image"
+                                onchange="document.getElementById('preview-image-polygon').src = window.URL.createObjectURL(this.files[0])">
+                        </div>
+
+                        <div class = "mb-3">
+                            <img src="" alt="" id="preview-image-polygon" class="img-thumbnail"
+                                width="400">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -250,78 +283,62 @@
 
         //GeoJSON Points
         var points = L.geoJSON(null, {
-            //style
-
-            //onEachFeature
             onEachFeature: function(feature, layer) {
-                // variable popup content
                 var popup_content = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                    "Dibuat: " + feature.properties.created_at + "<br>" +
+                    "<img src='{{ asset('storage/images') }}/" +
+                    feature.properties.image +
+                    "' alt='' class='img-thumbnail' width='400'>";
 
-                layer.on({
-                    click: function(e) {
-                        points.bindPopup(popup_content);
-                    },
-                });
+                layer.bindPopup(popup_content);
             },
         });
 
-        $.getJSON("{{ route('geojson.points') }}",
-            function(data) {
-                points.addData(data); // Menambahkan data ke dalam GeoJSON Point Sarana Prasarana
-                map.addLayer(points); // Menambahkan GeoJSON Point Sarana Prasarana ke dalam peta
-            });
+        $.getJSON("{{ route('geojson.points') }}", function(data) {
+            points.addData(data);
+            map.addLayer(points);
+        });
+
 
         //GeoJSON Polylines
         var polylines = L.geoJSON(null, {
-            //style
-
-            //onEachFeature
             onEachFeature: function(feature, layer) {
-                // variable popup content
                 var popup_content = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                    "Dibuat: " + feature.properties.created_at + "<br>" +
+                    "<img src='{{ asset('storage/images') }}/" +
+                    feature.properties.image +
+                    "' alt='' class='img-thumbnail' width='400'>";
 
-                layer.on({
-                    click: function(e) {
-                        polylines.bindPopup(popup_content);
-                    },
-                });
+                layer.bindPopup(popup_content);
             },
         });
 
-        $.getJSON("{{ route('geojson.polylines') }}",
-            function(data) {
-                polylines.addData(data); // Menambahkan data ke dalam GeoJSON Point Sarana Prasarana
-                map.addLayer(polylines); // Menambahkan GeoJSON Point Sarana Prasarana ke dalam peta
-            });
+        $.getJSON("{{ route('geojson.polylines') }}", function(data) {
+            polylines.addData(data);
+            map.addLayer(polylines);
+        });
+
 
         //GeoJSON Polygons
         var polygons = L.geoJSON(null, {
-            //style
-
-            //onEachFeature
             onEachFeature: function(feature, layer) {
-                // variable popup content
                 var popup_content = "Nama: " + feature.properties.name + "<br>" +
                     "Deskripsi: " + feature.properties.description + "<br>" +
-                    "Dibuat: " + feature.properties.created_at;
+                    "Dibuat: " + feature.properties.created_at + "<br>" +
+                    "<img src='{{ asset('storage/images') }}/" +
+                    feature.properties.image +
+                    "' alt='' class='img-thumbnail' width='400'>";
 
-                layer.on({
-                    click: function(e) {
-                        polygons.bindPopup(popup_content);
-                    },
-                });
+                layer.bindPopup(popup_content);
             },
         });
 
-        $.getJSON("{{ route('geojson.polygons') }}",
-            function(data) {
-                polygons.addData(data); // Menambahkan data ke dalam GeoJSON Point Sarana Prasarana
-                map.addLayer(polygons); // Menambahkan GeoJSON Point Sarana Prasarana ke dalam peta
-            });
+        $.getJSON("{{ route('geojson.polygons') }}", function(data) {
+            polygons.addData(data);
+            map.addLayer(polygons);
+        });
 
         // Control Layer
         var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
