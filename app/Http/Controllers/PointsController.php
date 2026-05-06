@@ -69,11 +69,12 @@ class PointsController extends Controller
         }
 
         $data = [
-            'geom' => $request->geometry_point,
+            'geometry_point' => $request->geometry_point,
             'name' => $request->name,
             'description' => $request->description,
             'image' => $name_image,
         ];
+
 
         //Simpan data ke database
         if (!$this->points->create($data)) {
@@ -113,8 +114,27 @@ class PointsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+      public function destroy(string $id)
     {
-        //
+        // Mencari data point berdasarkan ID
+        $point = $this->points->find($id);
+
+        if (!$point) {
+            return redirect()->route('peta')->with('error', 'Data point tidak ditemukan.');
+        }
+
+        $image = $point->image;
+
+        if (!$point->delete()) {
+            return redirect()->route('peta')->with('error', 'Gagal menghapus data point.');
+        }
+
+        if ($image != null) {
+            if (file_exists('./storage/images/' . $image)) {
+                unlink('./storage/images/' . $image);
+            }
+        }
+
+        return redirect()->route('peta')->with('success', 'Data point berhasil dihapus.');
     }
 }
